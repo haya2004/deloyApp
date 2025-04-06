@@ -1,0 +1,21 @@
+---
+- name: Déploiement d'un serveur Nginx Dockerisé
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Vérifier que Docker est installé
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Construire l'image Docker
+      command: docker build -t demo-image .
+      args:
+        chdir: /home/khemesse/mon-projet-docker
+
+    - name: Supprimer l'ancien conteneur s'il existe
+      command: docker rm -f demo-container
+      ignore_errors: yes
+
+    - name: Déployer le conteneur Nginx
+      command: docker run -d --name demo-container -p 8081:80 demo-image
